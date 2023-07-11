@@ -4,10 +4,27 @@ import { useState } from 'react';
 
 function App() {
   const [queryDescription, setQueryDescription] = useState('');
+  const [generatedQuery, setGeneratedQuery] = useState('');
 
-  const submitQuery = (e) => {
+  const submitQuery = async (e) => {
     e.preventDefault();
-    console.log('form submitted:', queryDescription);
+
+    const outputQuery = await generateQuery();
+    setGeneratedQuery(outputQuery);
+  };
+
+  const generateQuery = async () => {
+    const response = await fetch('http://localhost:3045/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ queryDescription: queryDescription }),
+    });
+
+    console.log(response);
+    const data = await response.json();
+    return data.response;
   };
 
   return (
@@ -24,6 +41,9 @@ function App() {
         />
         <input type='submit' value='Generate Answer' />
       </form>
+      <div className={styles.container}>
+        <p>{generatedQuery}</p>
+      </div>
     </main>
   );
 }
